@@ -13,6 +13,16 @@ variable "cloud_storage_uniform_bucket_level_access" {
     type        = bool
 }
 
+variable "cloud_storage_object_filename" {
+    description = "Cloud Storage Object filename"
+    type       = string
+}
+
+variable "cloud_storage_object_source_filename" {
+    description = "Cloud Storage Object source filename"
+    type       = string
+}
+
 variable "function_names" {
     description = "Cloud Function Names"
     type        = string

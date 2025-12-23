@@ -1,0 +1,221 @@
+openapi: 3.0.0
+info:
+  title: Inventory Management API
+  version: 1.0.0
+  description: Serverless API for managing inventory items
+
+servers:
+  - url: https://api-gateway-host/v1
+
+paths:
+  /items:
+    post:
+      summary: Create a new inventory item
+      operationId: createItem
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ItemInput'
+      responses:
+        '201':
+          description: Item created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Item'
+        '400':
+          description: Bad request
+          content: {}
+        '500':
+          description: Internal server error
+          content: {}
+      x-google-backend:
+        address: ${create_item_url}
+        jwt_audience: ""
+        disable_auth: true
+
+    get:
+      summary: Get all inventory items or a specific item by ID
+      operationId: getItems
+      parameters:
+        - in: query
+          name: itemId
+          schema:
+            type: string
+          description: Optional item ID to retrieve a specific item
+      responses:
+        '200':
+          description: Successfully retrieved items
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemsResponse'
+        '404':
+          description: Item not found
+          content: {}
+        '500':
+          description: Internal server error
+          content: {}
+      x-google-backend:
+        address: ${get_items_url}
+        jwt_audience: ""
+        disable_auth: true
+
+  /items/{itemId}:
+    put:
+      summary: Update an inventory item
+      operationId: updateItem
+      parameters:
+        - in: path
+          name: itemId
+          required: true
+          schema:
+            type: string
+          description: The ID of the item to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ItemUpdate'
+      responses:
+        '200':
+          description: Item updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Item'
+        '400':
+          description: Bad request
+          content: {}
+        '404':
+          description: Item not found
+          content: {}
+        '500':
+          description: Internal server error
+          content: {}
+      x-google-backend:
+        address: ${update_item_url}
+        jwt_audience: ""
+        disable_auth: true
+
+    delete:
+      summary: Delete an inventory item
+      operationId: deleteItem
+      parameters:
+        - in: path
+          name: itemId
+          required: true
+          schema:
+            type: string
+          description: The ID of the item to delete
+      responses:
+        '200':
+          description: Item deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Item'
+        '404':
+          description: Item not found
+          content: {}
+        '500':
+          description: Internal server error
+          content: {}
+      x-google-backend:
+        address: ${delete_item_url}
+        jwt_audience: ""
+        disable_auth: true
+
+components:
+  schemas:
+    ItemInput:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Item name
+        description:
+          type: string
+          description: Item description
+        quantity:
+          type: integer
+          description: Item quantity
+        price:
+          type: number
+          format: float
+          description: Item price
+        category:
+          type: string
+          description: Item category
+        imageUrl:
+          type: string
+          description: URL to item image
+      required:
+        - name
+
+    ItemUpdate:
+      type: object
+      properties:
+        itemId:
+          type: string
+          description: Item ID (required for updates)
+        name:
+          type: string
+        description:
+          type: string
+        quantity:
+          type: integer
+        price:
+          type: number
+          format: float
+        category:
+          type: string
+        imageUrl:
+          type: string
+      required:
+        - itemId
+
+    Item:
+      type: object
+      properties:
+        itemId:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        quantity:
+          type: integer
+        price:
+          type: number
+          format: float
+        category:
+          type: string
+        imageUrl:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    ItemsResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Item'
+
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: x-api-key
+      in: header
+
+security:
+  - api_key: []

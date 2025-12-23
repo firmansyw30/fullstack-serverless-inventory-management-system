@@ -17,16 +17,16 @@ data "archive_file" "cloud_functions_packages" {
 }
 
 # Define Cloud Storage Bucket for Cloud Functions source code
-resource "google_storage_bucket" "bucket" {
+resource "google_storage_bucket" "source_code_bucket" {
   name     = var.cloud_storage_bucket_name
   location = var.cloud_storage_location
   uniform_bucket_level_access = var.cloud_storage_uniform_bucket_level_access
 }
 
 resource "google_storage_bucket_object" "inventory_source_code" {
-  name   = "function-source.zip"
-  bucket = google_storage_bucket.bucket.name
-  source = "function-source.zip"  # Add path to the zipped function source code
+  name   = var.cloud_storage_object_filename
+  bucket = google_storage_bucket.source_code_bucket.name
+  source = var.cloud_storage_object_source_filename # Add path to the zipped function source code
 }
 
 # Define Cloud Function
@@ -39,7 +39,7 @@ resource "google_cloudfunctions2_function" "serverless_inventory_function" {
     runtime = var.function_runtimes
     source {
       storage_source {
-        bucket = google_storage_bucket.bucket.name
+        bucket = google_storage_bucket.source_code_bucket.name
         object = google_storage_bucket_object.inventory_source_code.name
       }
     }
