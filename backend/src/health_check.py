@@ -1,83 +1,45 @@
 import json
 import os
-from datetime import datetime
+import datetime
+from flask import Request
+from google.cloud import firestore
 
-import boto3
-from botocore.exceptions import ClientError
 
+def health_check(request: Request):
+    """Simple health check Cloud Function for Firestore connectivity.
 
-def lambda_handler(event, context):
-    """Simple health check Lambda.
-
-    - Returns 200 + details when DynamoDB DescribeTable succeeds.
+    - Returns 200 when a simple read from the configured collection succeeds.
     - Returns 500 with error details when the check fails.
-
-    Expected environment variable: DYNAMODB_TABLE
-    Supports GET and OPTIONS (for CORS preflight).
     """
     # Handle CORS preflight
-    http_method = event.get('httpMethod') or event.get('requestContext', {}).get('http', {}).get('method')
-    if http_method == 'OPTIONS':
-        return {
-            'statusCode': 200,
-            'headers': get_headers(),
-            'body': json.dumps({'message': 'ok'})
-        }
+    if request.method == 'OPTIONS':
+        return ('', 204, get_headers())
 
-    table_name = os.environ.get('DYNAMODB_TABLE')
-    if not table_name:
-        return {
-            'statusCode': 500,
-            'headers': get_headers(),
-            'body': json.dumps({'message': 'DYNAMODB_TABLE environment variable is not set'})
-        }
-
-    client = boto3.client('dynamodb')
-
+    collection = os.environ.get('FIRESTORE_COLLECTION', 'items')
     try:
-        resp = client.describe_table(TableName=table_name)
-        tbl = resp.get('Table', {})
+        client = firestore.Client()
+        # Try a light read (limit 1) to verify connectivity and permissions
+        docs = list(client.collection(collection).limit(1).stream())
 
         payload = {
             'status': 'ok',
-            'checkedAt': datetime.utcnow().isoformat(),
-            'table': {
-                'name': table_name,
-                'status': tbl.get('TableStatus'),
-                'itemCount': tbl.get('ItemCount'),
-                'sizeBytes': tbl.get('TableSizeBytes')
-            },
-            'region': client.meta.region_name
+            'checkedAt': datetime.datetime.utcnow().isoformat() + 'Z',
+            'collection': collection,
+            'sampleFound': len(docs) > 0,
+            'project': client.project
         }
 
-        return {
-            'statusCode': 200,
-            'headers': get_headers(),
-            'body': json.dumps(payload)
-        }
+        return (json.dumps(payload), 200, get_headers())
 
-    except ClientError as e:
-        # AWS-side error (e.g., table not found or permission denied)
-        print(f"DynamoDB ClientError: {e}")
-        return {
-            'statusCode': 500,
-            'headers': get_headers(),
-            'body': json.dumps({'message': 'DynamoDB describe_table failed', 'error': str(e)})
-        }
     except Exception as e:
-        # Generic error
         print(f"Health check error: {e}")
-        return {
-            'statusCode': 500,
-            'headers': get_headers(),
-            'body': json.dumps({'message': 'Health check failed', 'error': str(e)})
-        }
+        return (json.dumps({'message': 'Health check failed', 'error': str(e)}), 500, get_headers())
 
 
-def get_headers():
+def get_headers(allowed_methods: str = 'GET, OPTIONS'):
     return {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, OPTIONS',
+        'Access-Control-Allow-Methods': allowed_methods,
         'Access-Control-Allow-Headers': 'Content-Type'
     }

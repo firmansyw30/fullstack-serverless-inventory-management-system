@@ -1,0 +1,3 @@
+# Requirements for deploying these functions to Google Cloud Functions
+google-cloud-firestore
+Flask  # only for local testing (the request object is flask.Request)

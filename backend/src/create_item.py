@@ -1,69 +1,53 @@
 import json
-import boto3
 import os
 import uuid
-from datetime import datetime
-from decimal import Decimal
+import datetime
+from flask import Request
+from google.cloud import firestore
 
-def lambda_handler(event, context):
-    # Initialize DynamoDB
-    dynamodb = boto3.resource('dynamodb')
-    table = dynamodb.Table(os.environ.get('DYNAMODB_TABLE'))
-    
+
+def create_item(request: Request):
+    """HTTP Cloud Function to create an item in Firestore.
+
+    Expects JSON body with optional fields: name, description, quantity, price, category, imageUrl
+    Environment variable: FIRESTORE_COLLECTION (defaults to 'items')
+    """
+    # Handle CORS preflight
+    if request.method == 'OPTIONS':
+        return ('', 204, get_headers('POST, OPTIONS'))
+
     try:
-        # Parse request body
-        body = json.loads(event.get('body', '{}'), parse_float=Decimal)  # Convert floats to Decimal
-        
-        # Generate unique itemId and timestamps
+        body = request.get_json(silent=True) or {}
         item_id = str(uuid.uuid4())
-        timestamp = datetime.utcnow().isoformat()
-        
-        # Create item object
+        timestamp = datetime.datetime.utcnow().isoformat() + 'Z'
+
         item = {
             'itemId': item_id,
             'name': body.get('name'),
             'description': body.get('description'),
-            'quantity': int(body.get('quantity', 0)),  # Ensure quantity is integer
-            'price': Decimal(str(body.get('price', 0))),  # Convert price to Decimal
+            'quantity': int(body.get('quantity', 0)),
+            'price': float(body.get('price', 0)),
             'category': body.get('category'),
             'imageUrl': body.get('imageUrl'),
             'createdAt': timestamp,
             'updatedAt': timestamp
         }
-        
-        # Save to DynamoDB
-        table.put_item(Item=item)
-        
-        # Convert Decimal back to float for JSON response
-        response_item = {
-            **item,
-            'price': float(item['price'])  # Convert Decimal to float for JSON response
-        }
-        
-        return {
-            'statusCode': 201,
-            'headers': {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'POST, OPTIONS',
-                'Access-Control-Allow-Headers': 'Content-Type'
-            },
-            'body': json.dumps({
-                'message': 'Item created successfully',
-                'item': response_item
-            })
-        }
-        
+
+        client = firestore.Client()
+        collection = os.environ.get('FIRESTORE_COLLECTION', 'items')
+        client.collection(collection).document(item_id).set(item)
+
+        return (json.dumps({'message': 'Item created successfully', 'item': item}), 201, get_headers('POST, OPTIONS'))
+
     except Exception as e:
-        print(f"Error: {str(e)}")
-        return {
-            'statusCode': 500,
-            'headers': {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'
-            },
-            'body': json.dumps({
-                'message': 'Failed to create item',
-                'error': str(e)
-            })
-        }
+        print(f"Error creating item: {e}")
+        return (json.dumps({'message': 'Failed to create item', 'error': str(e)}), 500, get_headers('POST, OPTIONS'))
+
+
+def get_headers(allowed_methods: str = 'GET, POST, OPTIONS'):
+    return {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': allowed_methods,
+        'Access-Control-Allow-Headers': 'Content-Type'
+    }
