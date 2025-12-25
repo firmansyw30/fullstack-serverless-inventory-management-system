@@ -15,9 +15,20 @@ def update_item(request: Request):
 
     try:
         body = request.get_json(silent=True) or {}
-        item_id = body.get('itemId')
+        item_id = None
+        path_segments = request.path.strip('/').split('/')
+        if path_segments and len(path_segments) > 1: 
+            item_id = path_segments[-1]
+
+        if not item_id:
+            item_id = body.get('itemId')
+
         if not item_id:
             return (json.dumps({'message': 'itemId is required'}), 400, get_headers('PUT, OPTIONS'))
+
+        # item_id = body.get('itemId')
+        # if not item_id:
+        #     return (json.dumps({'message': 'itemId is required'}), 400, get_headers('PUT, OPTIONS'))
 
         client = firestore.Client()
         collection = os.environ.get('FIRESTORE_COLLECTION', 'items')

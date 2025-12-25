@@ -11,10 +11,14 @@ def delete_item(request: Request):
     """
     # Handle CORS preflight
     if request.method == 'OPTIONS':
-        return ('', 204, get_headers('DELETE, OPTIONS'))
-
+        return ('', 204, get_headers('DELETE, OPTIONS'))     
     try:
         item_id = request.args.get('itemId')
+        if not item_id:
+            path_segments = request.path.strip('/').split('/')
+            if path_segments:
+                item_id = path_segments[-1]
+
         if not item_id:
             return (json.dumps({'message': 'itemId is required'}), 400, get_headers('DELETE, OPTIONS'))
 
