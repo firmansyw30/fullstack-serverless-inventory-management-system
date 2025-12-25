@@ -1,221 +1,167 @@
-openapi: 3.0.0
+swagger: "2.0"
 info:
   title: Inventory Management API
-  version: 1.0.0
-  description: Serverless API for managing inventory items
+  version: "1.0.0"
+  description: API Gateway + Cloud Functions Gen 2
 
-servers:
-  - url: https://api-gateway-host/v1
+schemes:
+  - https
+consumes:
+  - application/json
+produces:
+  - application/json
 
-paths:
-  /items:
-    post:
-      summary: Create a new inventory item
-      operationId: createItem
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ItemInput'
-      responses:
-        '201':
-          description: Item created successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Item'
-        '400':
-          description: Bad request
-          content: {}
-        '500':
-          description: Internal server error
-          content: {}
-      x-google-backend:
-        address: ${create_item_url}
-        jwt_audience: ""
-        disable_auth: true
-
-    get:
-      summary: Get all inventory items or a specific item by ID
-      operationId: getItems
-      parameters:
-        - in: query
-          name: itemId
-          schema:
-            type: string
-          description: Optional item ID to retrieve a specific item
-      responses:
-        '200':
-          description: Successfully retrieved items
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ItemsResponse'
-        '404':
-          description: Item not found
-          content: {}
-        '500':
-          description: Internal server error
-          content: {}
-      x-google-backend:
-        address: ${get_items_url}
-        jwt_audience: ""
-        disable_auth: true
-
-  /items/{itemId}:
-    put:
-      summary: Update an inventory item
-      operationId: updateItem
-      parameters:
-        - in: path
-          name: itemId
-          required: true
-          schema:
-            type: string
-          description: The ID of the item to update
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ItemUpdate'
-      responses:
-        '200':
-          description: Item updated successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Item'
-        '400':
-          description: Bad request
-          content: {}
-        '404':
-          description: Item not found
-          content: {}
-        '500':
-          description: Internal server error
-          content: {}
-      x-google-backend:
-        address: ${update_item_url}
-        jwt_audience: ""
-        disable_auth: true
-
-    delete:
-      summary: Delete an inventory item
-      operationId: deleteItem
-      parameters:
-        - in: path
-          name: itemId
-          required: true
-          schema:
-            type: string
-          description: The ID of the item to delete
-      responses:
-        '200':
-          description: Item deleted successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Item'
-        '404':
-          description: Item not found
-          content: {}
-        '500':
-          description: Internal server error
-          content: {}
-      x-google-backend:
-        address: ${delete_item_url}
-        jwt_audience: ""
-        disable_auth: true
-
-components:
-  schemas:
-    ItemInput:
-      type: object
-      properties:
-        name:
-          type: string
-          description: Item name
-        description:
-          type: string
-          description: Item description
-        quantity:
-          type: integer
-          description: Item quantity
-        price:
-          type: number
-          format: float
-          description: Item price
-        category:
-          type: string
-          description: Item category
-        imageUrl:
-          type: string
-          description: URL to item image
-      required:
-        - name
-
-    ItemUpdate:
-      type: object
-      properties:
-        itemId:
-          type: string
-          description: Item ID (required for updates)
-        name:
-          type: string
-        description:
-          type: string
-        quantity:
-          type: integer
-        price:
-          type: number
-          format: float
-        category:
-          type: string
-        imageUrl:
-          type: string
-      required:
-        - itemId
-
-    Item:
-      type: object
-      properties:
-        itemId:
-          type: string
-        name:
-          type: string
-        description:
-          type: string
-        quantity:
-          type: integer
-        price:
-          type: number
-          format: float
-        category:
-          type: string
-        imageUrl:
-          type: string
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
-
-    ItemsResponse:
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/Item'
-
-  securitySchemes:
-    api_key:
-      type: apiKey
-      name: x-api-key
-      in: header
+securityDefinitions:
+  api_key:
+    type: apiKey
+    name: x-api-key
+    in: header
 
 security:
   - api_key: []
+
+paths:
+  /items:
+    get:
+      summary: Get items
+      operationId: getItems
+      parameters:
+        - name: itemId
+          in: query
+          type: string
+          required: false
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/ItemsResponse"
+      x-google-backend:
+        address: ${get_items_url}
+
+    post:
+      summary: Create item
+      operationId: createItem
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: "#/definitions/ItemInput"
+      responses:
+        201:
+          description: Created
+      x-google-backend:
+        address: ${create_item_url}
+
+  /items/{itemId}:
+    put:
+      summary: Update item
+      operationId: updateItem
+      parameters:
+        - name: itemId
+          in: path
+          required: true
+          type: string
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: "#/definitions/ItemUpdate"
+      responses:
+        200:
+          description: Updated
+      x-google-backend:
+        address: ${update_item_url}
+
+    delete:
+      summary: Delete item
+      operationId: deleteItem
+      parameters:
+        - name: itemId
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: Deleted
+      x-google-backend:
+        address: ${delete_item_url}
+
+  /health:
+    get:
+      summary: Health check
+      operationId: healthCheck
+      responses:
+        200:
+          description: OK
+      x-google-backend:
+        address: ${health_check_url}
+
+
+definitions:
+  ItemInput:
+    type: object
+    required:
+      - name
+    properties:
+      name:
+        type: string
+      description:
+        type: string
+      quantity:
+        type: integer
+      price:
+        type: number
+        format: float
+      category:
+        type: string
+      imageUrl:
+        type: string
+
+  ItemUpdate:
+    type: object
+    properties:
+      name:
+        type: string
+      description:
+        type: string
+      quantity:
+        type: integer
+      price:
+        type: number
+        format: float
+      category:
+        type: string
+      imageUrl:
+        type: string
+
+  Item:
+    type: object
+    properties:
+      itemId:
+        type: string
+      name:
+        type: string
+      description:
+        type: string
+      quantity:
+        type: integer
+      price:
+        type: number
+        format: float
+      category:
+        type: string
+      imageUrl:
+        type: string
+      createdAt:
+        type: string
+      updatedAt:
+        type: string
+
+  ItemsResponse:
+    type: object
+    properties:
+      items:
+        type: array
+        items:
+          $ref: "#/definitions/Item"

@@ -1,19 +1,34 @@
-# Archiving Cloud Functions source code files
+# Define the list of Cloud Functions to deploy
 locals {
-  cloud_functions = {
-    create_item           = "create_item.py"
-    get_items             = "get_items.py"
-    update_item           = "update_item.py"
-    delete_item           = "delete_item.py"
+  functions = {
+    create_item  = {
+      entry_point = "create_item"
+      description = "Create a new inventory item"
+    }
+    get_items    = {
+      entry_point = "get_items"
+      description = "Get inventory items"
+    }
+    update_item  = {
+      entry_point = "update_item"
+      description = "Update an inventory item"
+    }
+    delete_item  = {
+      entry_point = "delete_item"
+      description = "Delete an inventory item"
+    }
+    health_check = {
+      entry_point = "health_check"
+      description = "Health check endpoint"
+    }
   }
 }
 
-
-data "archive_file" "cloud_functions_packages" {
-  for_each = local.cloud_functions
+# Archive the entire backend/src directory (includes all .py files + requirements.txt)
+data "archive_file" "cloud_functions_package" {
   type        = "zip"
-  source_file = "../../backend/${each.value}"
-  output_path = "${replace(each.value, ".py", ".zip")}"
+  source_dir  = "${path.module}/../../backend/src"
+  output_path = "${path.module}/functions.zip"
 }
 
 # Define Cloud Storage Bucket for Cloud Functions source code
@@ -23,20 +38,24 @@ resource "google_storage_bucket" "source_code_bucket" {
   uniform_bucket_level_access = var.cloud_storage_uniform_bucket_level_access
 }
 
+# Upload the single ZIP file containing all function code
 resource "google_storage_bucket_object" "inventory_source_code" {
-  name   = var.cloud_storage_object_filename
+  name   = "functions-${data.archive_file.cloud_functions_package.output_md5}.zip"
   bucket = google_storage_bucket.source_code_bucket.name
-  source = var.cloud_storage_object_source_filename # Add path to the zipped function source code
+  source = data.archive_file.cloud_functions_package.output_path
 }
 
-# Define Cloud Function
-resource "google_cloudfunctions2_function" "serverless_inventory_function" {
-  name = var.function_names
-  location = var.function_location
-  description = var.function_description
+# Create separate Cloud Functions for each operation
+resource "google_cloudfunctions2_function" "inventory_functions" {
+  for_each = local.functions
+
+  name        = "${var.function_name_prefix}-${each.key}"
+  location    = var.function_location
+  description = each.value.description
 
   build_config {
-    runtime = var.function_runtimes
+    runtime     = var.function_runtimes
+    entry_point = each.value.entry_point
     source {
       storage_source {
         bucket = google_storage_bucket.source_code_bucket.name
@@ -49,5 +68,21 @@ resource "google_cloudfunctions2_function" "serverless_inventory_function" {
     max_instance_count  = var.function_max_instances_count
     available_memory    = var.function_memory
     timeout_seconds     = var.function_timeout_seconds
+    
+    environment_variables = {
+      FIRESTORE_COLLECTION = var.firestore_collection_name
+    }
   }
+}
+
+# Allow unauthenticated invocations for API Gateway
+resource "google_cloudfunctions2_function_iam_member" "invoker" {
+  for_each = local.functions
+
+  project        = google_cloudfunctions2_function.inventory_functions[each.key].project
+  location       = google_cloudfunctions2_function.inventory_functions[each.key].location
+  cloud_function = google_cloudfunctions2_function.inventory_functions[each.key].name
+  
+  role   = "roles/cloudfunctions.invoker"
+  member = "allUsers"
 }

@@ -24,13 +24,11 @@ variable "service_account_email" {
 variable "service_account_id" {
   description = "The ID of the service account to create"
   type        = string
-  default     = "inventory-cloud-functions-sa"
 }
 
 variable "service_account_display_name" {
   description = "Display name for the service account"
   type        = string
-  default     = "Inventory Cloud Functions Service Account"
 }
 
 # Cloud Storage Variables
@@ -49,19 +47,9 @@ variable "cloud_storage_uniform_bucket_level_access" {
   type        = bool
 }
 
-variable "cloud_storage_object_filename" {
-  description = "Cloud Storage Object filename"
-  type        = string
-}
-
-variable "cloud_storage_object_source_filename" {
-  description = "Cloud Storage Object source filename"
-  type        = string
-}
-
 # Cloud Function Variables
-variable "function_names" {
-  description = "Cloud Function Names"
+variable "function_name_prefix" {
+  description = "Prefix for Cloud Function names"
   type        = string
 }
 
@@ -72,11 +60,6 @@ variable "function_runtimes" {
 
 variable "function_location" {
   description = "Cloud Function Location"
-  type        = string
-}
-
-variable "function_description" {
-  description = "Cloud Function Description"
   type        = string
 }
 
@@ -177,4 +160,30 @@ variable "gateway_display_name" {
   description = "Display name for the API Gateway"
   type        = string
   default     = "Inventory Management API Gateway"
+}
+
+variable "gateway_region" {
+  description = "Region for the API Gateway (limited to us-central1, europe-west1, asia-northeast1, asia-southeast1)"
+  type        = string
+}
+
+# Cloud Firestore Variables
+variable "firestore_database_name" {
+  description = "Name of the Firestore database"
+  type        = string
+}
+
+variable "firestore_location" {
+  description = "Location of the Firestore database"
+  type        = string
+}
+
+variable "firestore_database_type" {
+  description = "Type of Firestore database"
+  type        = string
+}
+
+variable "firestore_items_collection_name" {
+  description = "Name of the Firestore collection for inventory items"
+  type        = string
 }

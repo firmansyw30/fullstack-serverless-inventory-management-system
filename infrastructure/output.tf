@@ -38,10 +38,10 @@ output "frontend_website_url" {
   value       = module.cloud-storage.frontend_website_url
 }
 
-output "frontend_files_count" {
-  description = "Number of frontend files uploaded to the bucket"
-  value       = module.cloud-storage.frontend_files_count
-}
+# output "frontend_files_count" {
+#   description = "Number of frontend files uploaded to the bucket"
+#   value       = module.cloud-storage.frontend_files_count
+# }
 
 # ============================================================
 # Cloud CDN Outputs
@@ -59,29 +59,44 @@ output "cdn_enabled" {
 # ============================================================
 # Cloud Functions Outputs
 # ============================================================
-output "cloud_function_name" {
-  description = "Name of the deployed Cloud Function"
-  value       = module.cloud-function.function_name
+output "cloud_function_names" {
+  description = "Map of all deployed Cloud Function names"
+  value       = module.cloud-function.function_names
 }
 
-output "cloud_function_uri" {
-  description = "HTTP(S) endpoint URL of the Cloud Function for API calls"
-  value       = module.cloud-function.function_uri
+output "cloud_function_uris" {
+  description = "Map of all Cloud Function URIs"
+  value       = module.cloud-function.function_uris
 }
 
-output "cloud_function_location" {
-  description = "Location of the deployed Cloud Function"
-  value       = module.cloud-function.function_location
+output "create_item_function_uri" {
+  description = "HTTP(S) endpoint URL for create_item function"
+  value       = module.cloud-function.create_item_function_uri
+}
+
+output "get_items_function_uri" {
+  description = "HTTP(S) endpoint URL for get_items function"
+  value       = module.cloud-function.get_items_function_uri
+}
+
+output "update_item_function_uri" {
+  description = "HTTP(S) endpoint URL for update_item function"
+  value       = module.cloud-function.update_item_function_uri
+}
+
+output "delete_item_function_uri" {
+  description = "HTTP(S) endpoint URL for delete_item function"
+  value       = module.cloud-function.delete_item_function_uri
+}
+
+output "health_check_function_uri" {
+  description = "HTTP(S) endpoint URL for health_check function"
+  value       = module.cloud-function.health_check_function_uri
 }
 
 output "source_code_bucket_name" {
   description = "Name of the Cloud Storage bucket containing Cloud Functions source code"
   value       = module.cloud-function.source_code_bucket_name
-}
-
-output "archived_source_files" {
-  description = "List of archived Python files deployed as Cloud Functions"
-  value       = module.cloud-function.archived_source_files
 }
 
 # ============================================================
@@ -107,6 +122,33 @@ output "api_config_id" {
   value       = module.api-gateway.api_config_id
 }
 
+# ============================================================
+# Cloud Firestore Outputs
+# ============================================================
+output "firestore_database_name" {
+  description = "The name of the Firestore database"
+  value       = module.cloud-firestore.database_name
+}
+
+output "firestore_database_location" {
+  description = "The location of the Firestore database"
+  value       = module.cloud-firestore.database_location
+}
+
+output "firestore_database_type" {
+  description = "The type of Firestore database"
+  value       = module.cloud-firestore.database_type
+}
+
+output "firestore_items_collection" {
+  description = "The name of the items collection in Firestore"
+  value       = module.cloud-firestore.items_collection_name
+}
+
+output "firestore_environment_variables" {
+  description = "Environment variables for Cloud Functions to access Firestore"
+  value       = module.cloud-firestore.firestore_environment_variables
+}
 
 # ============================================================
 # Project Information

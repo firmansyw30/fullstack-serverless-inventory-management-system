@@ -17,6 +17,7 @@ resource "google_api_gateway_api_config" "inventory_api_config" {
         get_items_url   = var.get_items_function_uri
         update_item_url = var.update_item_function_uri
         delete_item_url = var.delete_item_function_uri
+        health_check_url = var.health_check_function_uri
       }))
     }
   }
@@ -35,5 +36,6 @@ resource "google_api_gateway_gateway" "inventory_gateway" {
   provider      = google-beta
   api_config    = google_api_gateway_api_config.inventory_api_config.id
   gateway_id    = var.gateway_id
+  region        = var.gateway_region
   display_name  = var.gateway_display_name
 }

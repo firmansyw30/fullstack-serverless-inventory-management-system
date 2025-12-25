@@ -13,18 +13,8 @@ variable "cloud_storage_uniform_bucket_level_access" {
     type        = bool
 }
 
-variable "cloud_storage_object_filename" {
-    description = "Cloud Storage Object filename"
-    type       = string
-}
-
-variable "cloud_storage_object_source_filename" {
-    description = "Cloud Storage Object source filename"
-    type       = string
-}
-
-variable "function_names" {
-    description = "Cloud Function Names"
+variable "function_name_prefix" {
+    description = "Prefix for Cloud Function names"
     type        = string
 }
 
@@ -35,11 +25,6 @@ variable "function_runtimes" {
 
 variable "function_location" {
     description = "Cloud Function Location"
-    type        = string
-}
-
-variable "function_description" {
-    description = "Cloud Function Description"
     type        = string
 }
 
@@ -56,4 +41,9 @@ variable "function_memory" {
 variable "function_timeout_seconds" {
     description = "Timeout Duration for Cloud Functions in Seconds"
     type        = number
+}
+
+variable "firestore_collection_name" {
+    description = "Name of the Firestore collection"
+    type        = string
 }
