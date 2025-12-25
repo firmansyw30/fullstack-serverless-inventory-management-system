@@ -35,13 +35,13 @@ output "cdn_enabled" {
   value       = google_compute_backend_bucket.frontend_backend_bucket.enable_cdn
 }
 
-# Frontend Files Uploaded
-output "frontend_files_count" {
-  description = "Number of frontend files uploaded"
-  value       = length(google_storage_bucket_object.frontend_files)
-}
+# # Frontend Files Uploaded
+# output "frontend_files_count" {
+#   description = "Number of frontend files uploaded"
+#   value       = length(google_storage_bucket_object.frontend_files)
+# }
 
-output "frontend_files_list" {
-  description = "List of uploaded frontend files"
-  value       = keys(google_storage_bucket_object.frontend_files)
-}
+# output "frontend_files_list" {
+#   description = "List of uploaded frontend files"
+#   value       = keys(google_storage_bucket_object.frontend_files)
+# }

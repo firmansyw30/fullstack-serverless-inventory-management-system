@@ -65,6 +65,7 @@ resource "google_cloudfunctions2_function" "inventory_functions" {
   }
 
   service_config {
+    service_account_email = var.service_account_email
     max_instance_count  = var.function_max_instances_count
     available_memory    = var.function_memory
     timeout_seconds     = var.function_timeout_seconds

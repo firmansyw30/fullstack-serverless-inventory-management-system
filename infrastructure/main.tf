@@ -11,7 +11,7 @@ module "cloud-function" {
   function_memory                           = var.function_memory
   function_timeout_seconds                  = var.function_timeout_seconds
   firestore_collection_name                 = var.firestore_items_collection_name
-
+  service_account_email                     = module.iam.service_account_email
   # Ensure IAM roles are created before Cloud Functions
   depends_on = [module.iam]
 }

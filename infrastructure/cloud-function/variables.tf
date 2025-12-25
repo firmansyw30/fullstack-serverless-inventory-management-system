@@ -47,3 +47,8 @@ variable "firestore_collection_name" {
     description = "Name of the Firestore collection"
     type        = string
 }
+
+variable "service_account_email" {
+  description = "The email of the service account to run the function"
+  type        = string
+}
