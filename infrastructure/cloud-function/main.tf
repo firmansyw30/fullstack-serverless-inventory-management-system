@@ -72,6 +72,8 @@ resource "google_cloudfunctions2_function" "inventory_functions" {
     
     environment_variables = {
       FIRESTORE_COLLECTION = var.firestore_collection_name
+      FIRESTORE_DATABASE   = "inventory-db" # optional
+//      FIRESTORE_DATABASE = var.firestore_database_name
     }
   }
 }
