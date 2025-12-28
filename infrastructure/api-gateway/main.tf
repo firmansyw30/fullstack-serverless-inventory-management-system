@@ -1,4 +1,9 @@
 # API Gateway API resource
+
+locals {
+  api_config_id = "${var.api_config_id}-${var.release_stage}"
+}
+
 resource "google_api_gateway_api" "inventory_api" {
   provider = google-beta
   api_id   = var.api_id
@@ -8,7 +13,7 @@ resource "google_api_gateway_api" "inventory_api" {
 resource "google_api_gateway_api_config" "inventory_api_config" {
   provider        = google-beta
   api             = google_api_gateway_api.inventory_api.api_id
-  api_config_id   = var.api_config_id
+  api_config_id   = local.api_config_id
   openapi_documents {
     document {
       path = "openapi.yaml"
