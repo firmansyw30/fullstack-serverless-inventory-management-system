@@ -12,6 +12,7 @@ module "cloud-function" {
   function_timeout_seconds                  = var.function_timeout_seconds
   firestore_collection_name                 = var.firestore_items_collection_name
   service_account_email                     = module.iam.service_account_email
+  //firestore_database_name                    = var.firestore_database_name
   # Ensure IAM roles are created before Cloud Functions
   depends_on = [module.iam]
 }
@@ -26,14 +27,13 @@ module "iam" {
 
 # Cloud Firestore module for data persistence
 module "cloud-firestore" {
-  source                = "./cloud-firestore"
-  project_id            = var.project_id
-  database_name         = var.firestore_database_name
-  firestore_location    = var.firestore_location
-  database_type         = var.firestore_database_type
-  items_collection_name = var.firestore_items_collection_name
-
-  depends_on = [module.iam]
+  source                          = "./cloud-firestore"
+  project_id                      = var.project_id
+  # firestore_location              = var.firestore_location
+  # database_type                   = var.firestore_database_type
+  # firestore_database_name         = var.firestore_database_name
+  firestore_items_collection_name = var.firestore_items_collection_name
+  depends_on                      = [module.iam]
 }
 
 # Cloud Storage module for frontend hosting
@@ -59,6 +59,7 @@ module "api-gateway" {
   gateway_id                = var.gateway_id
   gateway_region            = var.gateway_region
   gateway_display_name      = var.gateway_display_name
+  release_stage             = var.release_stage
   create_item_function_uri  = module.cloud-function.create_item_function_uri
   get_items_function_uri    = module.cloud-function.get_items_function_uri
   update_item_function_uri  = module.cloud-function.update_item_function_uri

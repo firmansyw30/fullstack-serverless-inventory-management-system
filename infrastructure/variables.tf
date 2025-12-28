@@ -87,13 +87,11 @@ variable "frontend_bucket_name" {
 variable "frontend_bucket_location" {
   description = "Location of the Cloud Storage bucket for frontend"
   type        = string
-  default     = "US"
 }
 
 variable "frontend_uniform_bucket_level_access" {
   description = "Enable uniform bucket-level access for the frontend bucket"
   type        = bool
-  default     = true
 }
 
 variable "backend_bucket_name" {
@@ -104,62 +102,52 @@ variable "backend_bucket_name" {
 variable "enable_cdn" {
   description = "Enable Cloud CDN for the backend bucket"
   type        = bool
-  default     = true
 }
 
 variable "cdn_cache_mode" {
   description = "Cloud CDN cache mode"
   type        = string
-  default     = "CACHE_ALL_STATIC"
 }
 
 variable "cdn_negative_caching" {
   description = "Enable negative caching for Cloud CDN"
   type        = bool
-  default     = true
 }
 
 variable "cdn_client_ttl" {
   description = "Client TTL for Cloud CDN in seconds"
   type        = number
-  default     = 3600
 }
 
 variable "cdn_default_ttl" {
   description = "Default TTL for Cloud CDN in seconds"
   type        = number
-  default     = 3600
 }
 
 variable "cdn_max_ttl" {
   description = "Max TTL for Cloud CDN in seconds"
   type        = number
-  default     = 86400
 }
 
 # API Gateway Variables
 variable "api_id" {
   description = "The API ID for the API Gateway"
   type        = string
-  default     = "inventory-api"
 }
 
 variable "api_config_id" {
   description = "The API config ID for the API Gateway"
   type        = string
-  default     = "inventory-api-config"
 }
 
 variable "gateway_id" {
   description = "The Gateway ID for the API Gateway"
   type        = string
-  default     = "inventory-gateway"
 }
 
 variable "gateway_display_name" {
   description = "Display name for the API Gateway"
   type        = string
-  default     = "Inventory Management API Gateway"
 }
 
 variable "gateway_region" {
@@ -167,21 +155,26 @@ variable "gateway_region" {
   type        = string
 }
 
+variable "release_stage" {
+  description = "The release stage for the API Gateway"
+  type        = string
+}
+
 # Cloud Firestore Variables
-variable "firestore_database_name" {
-  description = "Name of the Firestore database"
-  type        = string
-}
+# variable "firestore_database_name" {
+#   description = "Name of the Firestore database"
+#   type        = string
+# }
 
-variable "firestore_location" {
-  description = "Location of the Firestore database"
-  type        = string
-}
+# variable "firestore_location" {
+#   description = "Location of the Firestore database"
+#   type        = string
+# }
 
-variable "firestore_database_type" {
-  description = "Type of Firestore database"
-  type        = string
-}
+# variable "firestore_database_type" {
+#   description = "Type of Firestore database"
+#   type        = string
+# }
 
 variable "firestore_items_collection_name" {
   description = "Name of the Firestore collection for inventory items"
