@@ -303,3 +303,21 @@ button:disabled {
     max-width: none;
   }
 }
+
+.home-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  color: inherit;
+  font: inherit;
+}
+
+.home-button:hover {
+  opacity: 0.8;
+}
+
+.home-button h1 {
+  margin: 0;
+}
