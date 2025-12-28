@@ -5,6 +5,11 @@ resource "google_storage_bucket" "frontend_hosting_bucket" {
   uniform_bucket_level_access = var.frontend_uniform_bucket_level_access
   force_destroy               = var.force_destroy
 
+  website {
+    main_page_suffix = "index.html"
+    not_found_page   = "index.html"
+  }
+
   cors {
     origin          = var.cors_origins
     method          = var.cors_methods
@@ -57,15 +62,6 @@ resource "google_storage_bucket_iam_member" "public_read_access" {
 #     regex(each.value, "(?P<ext>[^.]+)$")["ext"],
 #     "application/octet-stream"
 #   )
-
-#   depends_on = [google_storage_bucket.frontend_hosting_bucket]
-# }
-
-# # Configure bucket as a website with index and error pages
-# resource "google_storage_bucket_website_config" "frontend_website" {
-#   bucket            = google_storage_bucket.frontend_hosting_bucket.name
-#   main_page_suffix  = var.main_page_suffix
-#   not_found_page    = var.not_found_page
 
 #   depends_on = [google_storage_bucket.frontend_hosting_bucket]
 # }
