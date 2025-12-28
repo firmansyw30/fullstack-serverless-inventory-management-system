@@ -27,8 +27,8 @@ function App() {
       const data = await fetchItems();
       setItems(data.items || []);
     } catch (err) {
-      setError('Failed to fetch inventory items. Please try again.');
       console.error(err);
+      setError(err.message || 'Unexpected error');
     } finally {
       setIsLoading(false);
     }

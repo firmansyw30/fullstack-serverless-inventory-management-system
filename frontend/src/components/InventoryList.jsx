@@ -8,13 +8,14 @@ function InventoryList({ items, isLoading, onSelect, selectedItemId }) {
   return (
     <div className="inventory-list">
       <h2>Inventory Items</h2>
-      {items.length === 0 ? (
-        <p>No inventory items found.</p>
+
+      {items.length === 0 && !isLoading ? (
+        <p>No inventory items found. Please add an item.</p>
       ) : (
         <ul>
           {items.map(item => (
-            <li 
-              key={item.itemId} 
+            <li
+              key={item.itemId}
               className={selectedItemId === item.itemId ? 'selected' : ''}
               onClick={() => onSelect(item.itemId)}
             >
@@ -22,6 +23,7 @@ function InventoryList({ items, isLoading, onSelect, selectedItemId }) {
                 <span className="item-name">{item.name}</span>
                 <span className="item-quantity">Qty: {item.quantity}</span>
               </div>
+
               {item.category && (
                 <div className="item-category">{item.category}</div>
               )}
