@@ -1,50 +1,45 @@
 import json
 import datetime
-from flask import Request
-from utils import get_db, get_headers, get_item_id
+from utils import get_db, get_item_id, cors_response
 
-def update_item(request: Request):
-    if request.method == 'OPTIONS':
-        return ('', 204, get_headers('PUT, OPTIONS'))
+def update_item(request):
+    if request.method == "OPTIONS":
+        return cors_response(status=204)
 
     try:
         body = request.get_json(silent=True) or {}
-        
-        # 1. Coba ambil dari Helper (Path/Query)
-        item_id = get_item_id(request)
-        
-        # 2. Jika masih kosong, coba ambil dari Body JSON
-        if not item_id:
-            item_id = body.get('itemId')
+        item_id = get_item_id(request) or body.get("itemId")
 
         if not item_id:
-            return (json.dumps({'message': 'itemId is required'}), 400, get_headers('PUT, OPTIONS'))
+            return cors_response(
+                json.dumps({"message": "itemId is required"}), status=400
+            )
 
         collection = get_db()
         doc_ref = collection.document(item_id)
-        
+
         if not doc_ref.get().exists:
-            return (json.dumps({'message': 'Item not found'}), 404, get_headers('PUT, OPTIONS'))
+            return cors_response(
+                json.dumps({"message": "Item not found"}), status=404
+            )
 
-        updateable_fields = ['name', 'description', 'quantity', 'price', 'category', 'imageUrl']
-        updates = {}
-        for field in updateable_fields:
+        update_fields = {}
+        for field in ["name", "description", "quantity", "price", "category", "imageUrl"]:
             if field in body:
-                if field == 'quantity':
-                    updates[field] = int(body.get(field, 0))
-                elif field == 'price':
-                    updates[field] = float(body.get(field, 0))
-                else:
-                    updates[field] = body.get(field)
+                update_fields[field] = body[field]
 
-        updates['updatedAt'] = datetime.datetime.utcnow().isoformat() + 'Z'
+        update_fields["updatedAt"] = datetime.datetime.utcnow().isoformat() + "Z"
 
-        if updates:
-            doc_ref.update(updates)
+        if update_fields:
+            doc_ref.update(update_fields)
 
-        updated_doc = doc_ref.get().to_dict()
-        return (json.dumps({'message': 'Item updated successfully', 'item': updated_doc}), 200, get_headers('PUT, OPTIONS'))
+        updated_item = doc_ref.get().to_dict()
+        return cors_response(
+            json.dumps({"message": "Item updated successfully", "item": updated_item})
+        )
 
     except Exception as e:
-        print(f"Error updating item: {e}")
-        return (json.dumps({'message': 'Failed to update item', 'error': str(e)}), 500, get_headers('PUT, OPTIONS'))
+        return cors_response(
+            json.dumps({"message": "Failed to update item", "error": str(e)}),
+            status=500,
+        )

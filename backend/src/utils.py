@@ -1,33 +1,67 @@
+# # Load dotenv ONLY for local development
+# if os.environ.get("ENV", "local") == "local":
+#     try:
+#         from dotenv import load_dotenv
+#         load_dotenv()
+#     except ImportError:
+#         pass
+
+# def get_db():
+#     """
+#     Firestore collection provider
+#     - Cloud Functions: ENV injected by Terraform
+#     - Local: .env file
+#     """
+
+#     # ⚠️ IMPORTANT:
+#     # Firestore SDK in Cloud Functions should USE DEFAULT DATABASE
+#     # Do NOT force custom database here
+#     #client = firestore.Client()
+#     client = firestore.Client(database="inventory-db")
+
+#     collection_name = os.environ.get("FIRESTORE_COLLECTION", "items")
+#     database_name = os.environ.get("FIRESTORE_DATABASE")  # optional
+#     #database_name = os.environ.get("FIRESTORE_DATABASE", "inventory-db")
+
+#     #client = firestore.Client(database=database_name)
+#     return client.collection(collection_name)
+
 import os
 from google.cloud import firestore
 
 def get_db():
-    """Singleton-like Firestore client provider."""
-    # Cloud Functions reuses global variables across invocations (warm start)
-    # But for safety, we instantiate client here.
     collection_name = os.environ.get("FIRESTORE_COLLECTION", "items")
-    client = firestore.Client()
+    database_name = os.environ.get("FIRESTORE_DATABASE")
+
+    if database_name:
+        client = firestore.Client(database=database_name)
+    else:
+        client = firestore.Client()
+
     return client.collection(collection_name)
 
-def get_headers(allowed_methods: str = 'GET, OPTIONS'):
-    """Standardized CORS headers."""
-    return {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': allowed_methods,
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-api-key'
-    }
 
 def get_item_id(request):
-    """Helper to extract itemId from Query Param OR URL Path."""
-    # 1. Try Query Param
-    item_id = request.args.get('itemId')
-    
-    # 2. Try Path Fallback
+    # Query param
+    item_id = request.args.get("itemId")
+
+    # Path fallback (API Gateway style)
     if not item_id:
-        path_segments = request.path.strip('/').split('/')
-        if path_segments:
-            # Mengambil segmen terakhir sebagai ID
-            item_id = path_segments[-1]
-            
+        segments = request.path.strip("/").split("/")
+        if segments:
+            item_id = segments[-1]
+
     return item_id
+
+
+def cors_response(body=None, status=200):
+    return (
+        body or "",
+        status,
+        {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type, Authorization, x-api-key",
+        },
+    )
