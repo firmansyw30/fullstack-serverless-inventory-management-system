@@ -1,102 +1,108 @@
-// API Gateway integration layer
+const API_ENDPOINT = process.env.REACT_APP_API_ENDPOINT;
+const API_KEY = process.env.REACT_APP_API_KEY;
 
-const API_ENDPOINT = 'https://api.example.com';
+if (!API_ENDPOINT || !API_KEY) {
+  throw new Error('API configuration is missing');
+}
 
-// Fetch all inventory items
+const defaultHeaders = {
+  'Content-Type': 'application/json',
+  'x-api-key': API_KEY,
+};
+
+// =====================
+// GET ALL ITEMS
+// =====================
 export async function fetchItems() {
-  try {
-    const response = await fetch(`${API_ENDPOINT}/items`);
-    
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || `API error: ${response.status}`);
-    }
-    
-    return await response.json();
-  } catch (error) {
-    console.error('Error fetching items:', error);
-    throw error;
+  console.log('Fetching:', `${API_ENDPOINT}/items`);
+  const response = await fetch(`${API_ENDPOINT}/items`, {
+    headers: defaultHeaders,
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`API ${response.status}: ${text}`);
   }
+
+  return response.json();
 }
 
-// Fetch a single inventory item
+// =====================
+// GET SINGLE ITEM
+// =====================
 export async function fetchItem(itemId) {
-  try {
-    const response = await fetch(`${API_ENDPOINT}/items?itemId=${itemId}`);
-    
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || `API error: ${response.status}`);
-    }
-    
-    return await response.json();
-  } catch (error) {
-    console.error(`Error fetching item ${itemId}:`, error);
-    throw error;
+  const response = await fetch(
+    `${API_ENDPOINT}/items?itemId=${itemId}`,
+    { headers: defaultHeaders }
+  );
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`API ${response.status}: ${text}`);
   }
+
+  return response.json();
 }
 
-// Create a new inventory item
+// =====================
+// CREATE ITEM
+// =====================
 export async function createItem(itemData) {
-  try {
-    const response = await fetch(`${API_ENDPOINT}/items`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(itemData),
-    });
-    
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || `API error: ${response.status}`);
-    }
-    
-    return await response.json();
-  } catch (error) {
-    console.error('Error creating item:', error);
-    throw error;
+  const response = await fetch(`${API_ENDPOINT}/items`, {
+    method: 'POST',
+    headers: defaultHeaders,
+    body: JSON.stringify(itemData),
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`API ${response.status}: ${text}`);
   }
+
+  return response.json();
 }
 
-// Update an existing inventory item
+// =====================
+// UPDATE ITEM
+// =====================
 export async function updateItem(itemData) {
-  try {
-    const response = await fetch(`${API_ENDPOINT}/items`, {
+  const response = await fetch(
+    `${API_ENDPOINT}/items/${itemData.itemId}`,
+    {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: defaultHeaders,
       body: JSON.stringify(itemData),
-    });
-    
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || `API error: ${response.status}`);
     }
-    
-    return await response.json();
-  } catch (error) {
-    console.error(`Error updating item ${itemData.itemId}:`, error);
-    throw error;
+  );
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`API ${response.status}: ${text}`);
   }
+
+  return response.json();
 }
 
-// Delete an inventory item
+// =====================
+// DELETE ITEM
+// =====================
 export async function deleteItem(itemId) {
-  try {
-    const response = await fetch(`${API_ENDPOINT}/items?itemId=${itemId}`, {
+  const response = await fetch(
+    `${API_ENDPOINT}/items/${itemId}`,
+    {
       method: 'DELETE',
-    });
-    
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || `API error: ${response.status}`);
+      headers: defaultHeaders,
     }
-    
-    return await response.json();
-  } catch (error) {
-    console.error(`Error deleting item ${itemId}:`, error);
-    throw error;
+  );
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`API ${response.status}: ${text}`);
   }
+
+  return response.json();
+}
+
+if (process.env.NODE_ENV === 'development') {
+  console.log('API ENDPOINT:', API_ENDPOINT);
 }
