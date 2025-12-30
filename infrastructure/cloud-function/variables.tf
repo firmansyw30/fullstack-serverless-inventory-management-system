@@ -48,10 +48,10 @@ variable "firestore_collection_name" {
     type        = string
 }
 
-# variable "firestore_database_name" {
-#     description = "Name of the database"
-#     type        = string
-# }
+variable "firestore_database_name" {
+    description = "Name of the database"
+    type        = string
+}
 
 variable "service_account_email" {
   description = "The email of the service account to run the function"

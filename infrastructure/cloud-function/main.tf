@@ -1,3 +1,28 @@
+resource "google_project_service" "cloud_storage_api" {
+  service = "storage.googleapis.com"
+  disable_on_destroy = false
+}
+
+resource "google_project_service" "cloud_functions_api" {
+  service = "cloudfunctions.googleapis.com"
+  disable_on_destroy = false
+}
+
+resource "google_project_service" "cloud_run_api" {
+  service = "run.googleapis.com"
+  disable_on_destroy = false
+}
+
+resource "google_project_service" "cloud_build_api" {
+  service = "cloudbuild.googleapis.com"
+  disable_on_destroy = false
+}
+
+resource "google_project_service" "artifact_registry_api" {
+  service = "artifactregistry.googleapis.com"
+  disable_on_destroy = false
+}
+
 # Define the list of Cloud Functions to deploy
 locals {
   functions = {
@@ -36,6 +61,10 @@ resource "google_storage_bucket" "source_code_bucket" {
   name     = var.cloud_storage_bucket_name
   location = var.cloud_storage_location
   uniform_bucket_level_access = var.cloud_storage_uniform_bucket_level_access
+
+  lifecycle {
+    ignore_changes = all
+  }
 }
 
 # Upload the single ZIP file containing all function code
@@ -72,9 +101,13 @@ resource "google_cloudfunctions2_function" "inventory_functions" {
     
     environment_variables = {
       FIRESTORE_COLLECTION = var.firestore_collection_name
-      FIRESTORE_DATABASE   = "inventory-db" # optional
-//      FIRESTORE_DATABASE = var.firestore_database_name
+      //FIRESTORE_DATABASE   = "inventory-db" # optional
+      FIRESTORE_DATABASE = var.firestore_database_name
     }
+  }
+
+  lifecycle {
+    ignore_changes = all
   }
 }
 
