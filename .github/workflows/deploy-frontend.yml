@@ -49,18 +49,18 @@ jobs:
           # Init Terraform
           terraform init -input=false
 
-          # DEBUG: Cek apakah Terraform benar-benar melihat output
           echo "🔍 DEBUG: Listing all outputs..."
           terraform output || echo "⚠️ No outputs found command failed"
 
-          # Ambil output dengan error handling yang lebih ketat
-          # Kita gunakan grep untuk memastikan kita tidak mengambil text Warning
+
+          # Take output with stricter error handling & using grep to avoid Warning texts
           API_URL=$(terraform output -raw api_gateway_url 2>/dev/null || true)
           
-          # Cek validitas API_URL
+
+          # Check validity of API_URL
           if [[ -z "$API_URL" ]] || [[ "$API_URL" == *"Warning"* ]]; then
-            echo "❌ Error: Output 'api_gateway_url' tidak ditemukan atau state kosong."
-            echo "Pastikan 'terraform apply' sudah dijalankan untuk infrastruktur."
+            echo "❌ Error: Output 'api_gateway_url' not found."
+            echo "Make sure to run 'terraform apply' for infrastructure."
             exit 1
           fi
 
@@ -101,12 +101,22 @@ jobs:
        working-directory: ./frontend
        run: npm ci
     
+    #  - name: Build Frontend
+    #    working-directory: ./frontend
+    #    run: |
+    #      echo "🏗️ Building frontend with real API endpoint..."
+    #      npm run build
+    #      echo "✅ Build complete!"
      - name: Build Frontend
        working-directory: ./frontend
        run: |
-         echo "🏗️ Building frontend with real API endpoint..."
-         npm run build
-         echo "✅ Build complete!"
+          echo "Debug: Checking .env content before build..."
+          cat .env
+            
+          echo "Debug: Building..."
+          # Pastikan env variable juga diexport ke shell process agar aman
+          export $(cat .env | xargs)
+          npm run build
     
      - name: Verify Build
        working-directory: ./frontend
