@@ -39,10 +39,25 @@ jobs:
        id: infra
        working-directory: ./infrastructure
        run: |
+         set -euo pipefail
+
+         # Ensure Terraform is initialized
          terraform init -input=false
-         API_URL=$(terraform output -raw api_gateway_url)
-         FRONTEND_BUCKET=$(terraform output -raw frontend_bucket_name)
-         FRONTEND_URL=$(terraform output -raw frontend_website_url)
+
+         # Safely read each output; redirect warnings to stderr and check emptiness
+         API_URL=$(terraform output -raw api_gateway_url 2>/dev/null || true)
+         if [ -z "$API_URL" ]; then
+           echo "Error: terraform output 'api_gateway_url' not found or empty" >&2
+           exit 1
+         fi
+
+         FRONTEND_BUCKET=$(terraform output -raw frontend_bucket_name 2>/dev/null || true)
+         FRONTEND_URL=$(terraform output -raw frontend_website_url 2>/dev/null || true)
+
+         # Normalize FRONTEND_URL (remove trailing slash)
+         FRONTEND_URL="${FRONTEND_URL%/}"
+
+         # Only write valid name=value lines to $GITHUB_OUTPUT
          echo "api_url=$API_URL" >> $GITHUB_OUTPUT
          echo "frontend_bucket_name=$FRONTEND_BUCKET" >> $GITHUB_OUTPUT
          echo "frontend_url=$FRONTEND_URL" >> $GITHUB_OUTPUT
