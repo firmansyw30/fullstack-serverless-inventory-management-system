@@ -2,7 +2,7 @@ name: Deploy Frontend on Push
 
 on:
  push:
-   branches: [main] # Change to desired branch
+   branches: [main] # Change to desired branch 
    paths:
      - 'frontend/**'
      - '.github/workflows/deploy-frontend.yml'
