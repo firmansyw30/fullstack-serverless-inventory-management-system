@@ -12,7 +12,7 @@ module "cloud-function" {
   function_timeout_seconds                  = var.function_timeout_seconds
   firestore_collection_name                 = var.firestore_items_collection_name
   service_account_email                     = module.iam.service_account_email
-  //firestore_database_name                    = var.firestore_database_name
+  firestore_database_name                   = var.firestore_database_name
   # Ensure IAM roles are created before Cloud Functions
   depends_on = [module.iam]
 }
@@ -27,11 +27,11 @@ module "iam" {
 
 # Cloud Firestore module for data persistence
 module "cloud-firestore" {
-  source                          = "./cloud-firestore"
-  project_id                      = var.project_id
-  # firestore_location              = var.firestore_location
-  # database_type                   = var.firestore_database_type
-  # firestore_database_name         = var.firestore_database_name
+  source     = "./cloud-firestore"
+  project_id = var.project_id
+  firestore_location              = var.firestore_location
+  database_type                   = var.firestore_database_type
+  firestore_database_name         = var.firestore_database_name
   firestore_items_collection_name = var.firestore_items_collection_name
   depends_on                      = [module.iam]
 }
@@ -49,6 +49,10 @@ module "cloud-storage" {
   cdn_client_ttl                       = var.cdn_client_ttl
   cdn_default_ttl                      = var.cdn_default_ttl
   cdn_max_ttl                          = var.cdn_max_ttl
+  main_page_suffix                     = var.main_page_suffix
+  not_found_page                       = var.not_found_page
+  # force_destroy                       = var.force_destroy
+  allow_destroy                        = var.allow_destroy
 }
 
 # API Gateway module for REST API exposure

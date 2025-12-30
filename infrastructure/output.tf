@@ -125,30 +125,30 @@ output "api_config_id" {
 # ============================================================
 # Cloud Firestore Outputs
 # ============================================================
-# output "firestore_database_name" {
-#   description = "The name of the Firestore database"
-#   value       = module.cloud-firestore.database_name
-# }
+output "firestore_database_name" {
+  description = "The name of the Firestore database"
+  value       = module.cloud-firestore.database_name
+}
 
-# output "firestore_database_location" {
-#   description = "The location of the Firestore database"
-#   value       = module.cloud-firestore.database_location
-# }
+output "firestore_database_location" {
+  description = "The location of the Firestore database"
+  value       = module.cloud-firestore.database_location
+}
 
-# output "firestore_database_type" {
-#   description = "The type of Firestore database"
-#   value       = module.cloud-firestore.database_type
-# }
+output "firestore_database_type" {
+  description = "The type of Firestore database"
+  value       = module.cloud-firestore.database_type
+}
 
-# output "firestore_items_collection" {
-#   description = "The name of the items collection in Firestore"
-#   value       = module.cloud-firestore.firestore_items_collection_name
-# }
+output "firestore_items_collection" {
+  description = "The name of the items collection in Firestore"
+  value       = module.cloud-firestore.firestore_items_collection_name
+}
 
-# output "firestore_environment_variables" {
-#   description = "Environment variables for Cloud Functions to access Firestore"
-#   value       = module.cloud-firestore.firestore_environment_variables
-# }
+output "firestore_environment_variables" {
+  description = "Environment variables for Cloud Functions to access Firestore"
+  value       = module.cloud-firestore.firestore_environment_variables
+}
 
 # ============================================================
 # Project Information

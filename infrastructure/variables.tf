@@ -79,6 +79,21 @@ variable "function_timeout_seconds" {
 }
 
 # Frontend Cloud Storage Variables
+variable "main_page_suffix" {
+  description = "Main page suffix for website hosting"
+  type        = string
+}
+
+variable "not_found_page" {
+  description = "Not found page for website hosting"
+  type        = string
+}
+
+variable "allow_destroy" {
+  description = "Allow destroy of the frontend hosting bucket"
+  type        = bool
+}
+
 variable "frontend_bucket_name" {
   description = "Name of the Cloud Storage bucket for hosting React frontend"
   type        = string
@@ -161,20 +176,20 @@ variable "release_stage" {
 }
 
 # Cloud Firestore Variables
-# variable "firestore_database_name" {
-#   description = "Name of the Firestore database"
-#   type        = string
-# }
+variable "firestore_database_name" {
+  description = "Name of the Firestore database"
+  type        = string
+}
 
-# variable "firestore_location" {
-#   description = "Location of the Firestore database"
-#   type        = string
-# }
+variable "firestore_location" {
+  description = "Location of the Firestore database"
+  type        = string
+}
 
-# variable "firestore_database_type" {
-#   description = "Type of Firestore database"
-#   type        = string
-# }
+variable "firestore_database_type" {
+  description = "Type of Firestore database"
+  type        = string
+}
 
 variable "firestore_items_collection_name" {
   description = "Name of the Firestore collection for inventory items"
