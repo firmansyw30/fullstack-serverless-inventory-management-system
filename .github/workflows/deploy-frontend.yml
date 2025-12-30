@@ -101,22 +101,27 @@ jobs:
        working-directory: ./frontend
        run: npm ci
     
+     - name: Build Frontend
+       working-directory: ./frontend
+       env:
+         REACT_APP_API_ENDPOINT: ${{ steps.infra.outputs.api_url }}
+         REACT_APP_API_KEY: ${{ secrets.GCLOUD_API_KEY }}
+         #CI: false
+       run: |
+         echo "🏗️ Building frontend with real API endpoint..."
+         npm run build
+         echo "✅ Build complete!"
+
     #  - name: Build Frontend
     #    working-directory: ./frontend
     #    run: |
-    #      echo "🏗️ Building frontend with real API endpoint..."
-    #      npm run build
-    #      echo "✅ Build complete!"
-     - name: Build Frontend
-       working-directory: ./frontend
-       run: |
-          echo "Debug: Checking .env content before build..."
-          cat .env
+    #       echo "Debug: Checking .env content before build..."
+    #       cat .env
             
-          echo "Debug: Building..."
-          # Pastikan env variable juga diexport ke shell process agar aman
-          export $(cat .env | xargs)
-          npm run build
+    #       echo "Debug: Building..."
+    #       # Pastikan env variable juga diexport ke shell process agar aman
+    #       export $(cat .env | xargs)
+    #       npm run build
     
      - name: Verify Build
        working-directory: ./frontend
