@@ -26,26 +26,31 @@ variable "gateway_region" {
 variable "create_item_function_uri" {
   description = "URI of the Create Item Cloud Function"
   type        = string
+//  default    = ""
 }
 
 variable "get_items_function_uri" {
   description = "URI of the Get Items Cloud Function"
   type        = string
+//  default    = ""
 }
 
 variable "update_item_function_uri" {
   description = "URI of the Update Item Cloud Function"
   type        = string
+//  default    = ""
 }
 
 variable "delete_item_function_uri" {
   description = "URI of the Delete Item Cloud Function"
   type        = string
+//  default    = ""
 }
 
 variable "health_check_function_uri" {
   description = "URI of the Health Check Cloud Function"
   type        = string
+//  default    = ""
 }
 
 variable "release_stage" {

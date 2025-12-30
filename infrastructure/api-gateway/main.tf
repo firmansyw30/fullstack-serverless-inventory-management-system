@@ -1,5 +1,10 @@
 # API Gateway API resource
 
+resource "google_project_service" "api_gateway_api" {
+  service = "apigateway.googleapis.com"
+  disable_on_destroy = false
+}
+
 locals {
   api_config_id = "${var.api_config_id}-${var.release_stage}"
 }
@@ -18,11 +23,11 @@ resource "google_api_gateway_api_config" "inventory_api_config" {
     document {
       path = "openapi.yaml"
       contents = base64encode(templatefile("${path.module}/openapi.yaml", {
-        create_item_url = var.create_item_function_uri
-        get_items_url   = var.get_items_function_uri
-        update_item_url = var.update_item_function_uri
-        delete_item_url = var.delete_item_function_uri
-        health_check_url = var.health_check_function_uri
+        create_item_url  = coalesce(var.create_item_function_uri, "")
+        get_items_url    = coalesce(var.get_items_function_uri, "")
+        update_item_url  = coalesce(var.update_item_function_uri, "")
+        delete_item_url  = coalesce(var.delete_item_function_uri, "")
+        health_check_url = coalesce(var.health_check_function_uri, "")
       }))
     }
   }
