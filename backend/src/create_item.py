@@ -11,7 +11,7 @@ def create_item(request):
         body = request.get_json(silent=True) or {}
 
         item_id = str(uuid.uuid4())
-        now = datetime.datetime.utcnow().isoformat() + "Z"
+        now = datetime.datetime.now(datetime.timezone.utc).isoformat().replace("+00:00", "Z")
 
         item = {
             "itemId": item_id,

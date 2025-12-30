@@ -28,7 +28,7 @@ def update_item(request):
             if field in body:
                 update_fields[field] = body[field]
 
-        update_fields["updatedAt"] = datetime.datetime.utcnow().isoformat() + "Z"
+        update_fields["updatedAt"] = datetime.datetime.now(datetime.timezone.utc).isoformat()
 
         if update_fields:
             doc_ref.update(update_fields)

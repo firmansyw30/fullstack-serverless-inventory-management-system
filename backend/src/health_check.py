@@ -12,7 +12,7 @@ def health_check(request):
 
         payload = {
             "status": "ok",
-            "checkedAt": datetime.datetime.utcnow().isoformat() + "Z",
+            "checkedAt": datetime.datetime.now(datetime.timezone.utc).isoformat(),
             "collection": collection.id,
             "sampleFound": len(docs) > 0,
         }
