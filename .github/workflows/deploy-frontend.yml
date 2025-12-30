@@ -39,28 +39,40 @@ jobs:
        id: infra
        working-directory: ./infrastructure
        run: |
-         set -euo pipefail
+        set -euo pipefail
 
-         # Ensure Terraform is initialized
-         terraform init -input=false
+          # Init Terraform
+          terraform init -input=false
 
-         # Safely read each output; redirect warnings to stderr and check emptiness
-         API_URL=$(terraform output -raw api_gateway_url 2>/dev/null || true)
-         if [ -z "$API_URL" ]; then
-           echo "Error: terraform output 'api_gateway_url' not found or empty" >&2
-           exit 1
-         fi
+          # DEBUG: Cek apakah Terraform benar-benar melihat output
+          echo "🔍 DEBUG: Listing all outputs..."
+          terraform output || echo "⚠️ No outputs found command failed"
 
-         FRONTEND_BUCKET=$(terraform output -raw frontend_bucket_name 2>/dev/null || true)
-         FRONTEND_URL=$(terraform output -raw frontend_website_url 2>/dev/null || true)
+          # Ambil output dengan error handling yang lebih ketat
+          # Kita gunakan grep untuk memastikan kita tidak mengambil text Warning
+          API_URL=$(terraform output -raw api_gateway_url 2>/dev/null || true)
+          
+          # Cek validitas API_URL
+          if [[ -z "$API_URL" ]] || [[ "$API_URL" == *"Warning"* ]]; then
+            echo "❌ Error: Output 'api_gateway_url' tidak ditemukan atau state kosong."
+            echo "Pastikan 'terraform apply' sudah dijalankan untuk infrastruktur."
+            exit 1
+          fi
 
-         # Normalize FRONTEND_URL (remove trailing slash)
-         FRONTEND_URL="${FRONTEND_URL%/}"
+          FRONTEND_BUCKET=$(terraform output -raw frontend_bucket_name 2>/dev/null || true)
+          FRONTEND_URL=$(terraform output -raw frontend_website_url 2>/dev/null || true)
 
-         # Only write valid name=value lines to $GITHUB_OUTPUT
-         echo "api_url=$API_URL" >> $GITHUB_OUTPUT
-         echo "frontend_bucket_name=$FRONTEND_BUCKET" >> $GITHUB_OUTPUT
-         echo "frontend_url=$FRONTEND_URL" >> $GITHUB_OUTPUT
+          # Normalize FRONTEND_URL (remove trailing slash)
+          FRONTEND_URL="${FRONTEND_URL%/}"
+
+          echo "✅ Outputs Found:"
+          echo "API_URL: $API_URL"
+          echo "BUCKET: $FRONTEND_BUCKET"
+
+          # Write to GITHUB_OUTPUT
+          echo "api_url=$API_URL" >> $GITHUB_OUTPUT
+          echo "frontend_bucket_name=$FRONTEND_BUCKET" >> $GITHUB_OUTPUT
+          echo "frontend_url=$FRONTEND_URL" >> $GITHUB_OUTPUT
     
      - name: Setup Node.js
        uses: actions/setup-node@v3
