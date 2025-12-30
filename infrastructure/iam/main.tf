@@ -3,6 +3,10 @@ resource "google_service_account" "cloud_functions_sa" {
   account_id   = var.service_account_id
   display_name = var.service_account_display_name
   description  = "Service account for Cloud Functions to access Cloud Storage and Firestore"
+
+  lifecycle {
+    ignore_changes = [account_id]
+  }
 }
 
 # IAM Role Binding - Cloud Functions Runner
@@ -31,6 +35,13 @@ resource "google_project_iam_member" "storage_viewer" {
   project = var.project_id
   role    = "roles/storage.objectViewer"
   member  = "serviceAccount:${google_service_account.cloud_functions_sa.email}"
+}
+
+# Public Read Access to Cloud Storage Objects (if needed)
+resource "google_project_iam_member" "public_storage_viewer" {
+  project = var.project_id
+  role    = "roles/storage.objectViewer"
+  member  = "allUsers"
 }
 
 # IAM Role Binding - Firestore Database Admin (for CRUD operations on Firestore)

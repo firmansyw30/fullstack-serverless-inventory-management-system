@@ -7,25 +7,23 @@ variable "frontend_bucket_name" {
 variable "frontend_bucket_location" {
   description = "Location of the Cloud Storage bucket (e.g., US, EU, ASIA-SOUTHEAST2)"
   type        = string
-  default     = "US"
 }
 
 variable "frontend_uniform_bucket_level_access" {
   description = "Enable uniform bucket-level access for the frontend bucket"
   type        = bool
-  default     = true
 }
 
 variable "force_destroy" {
   description = "Allow Terraform to destroy the bucket even if it contains objects"
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "allow_destroy" {
   description = "Allow destruction of the bucket with lifecycle rules"
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "enable_versioning" {
@@ -63,13 +61,11 @@ variable "cors_max_age_seconds" {
 variable "main_page_suffix" {
   description = "Main page suffix for website hosting"
   type        = string
-  default     = "index.html"
 }
 
 variable "not_found_page" {
   description = "Not found page for website hosting"
   type        = string
-  default     = "index.html"
 }
 
 # CDN Backend Bucket Variables
@@ -81,19 +77,16 @@ variable "backend_bucket_name" {
 variable "enable_cdn" {
   description = "Enable Cloud CDN for the backend bucket"
   type        = bool
-  default     = true
 }
 
 variable "cdn_cache_mode" {
   description = "Cloud CDN cache mode (CACHE_ALL_STATIC, INVALIDATE_ON_CHANGES, or USE_ORIGIN_HEADERS)"
   type        = string
-  default     = "CACHE_ALL_STATIC"
 }
 
 variable "cdn_negative_caching" {
   description = "Enable negative caching for Cloud CDN"
   type        = bool
-  default     = true
 }
 
 variable "cdn_negative_caching_max_age_sec" {
@@ -105,17 +98,14 @@ variable "cdn_negative_caching_max_age_sec" {
 variable "cdn_client_ttl" {
   description = "Client TTL for Cloud CDN in seconds"
   type        = number
-  default     = 3600
 }
 
 variable "cdn_default_ttl" {
   description = "Default TTL for Cloud CDN in seconds"
   type        = number
-  default     = 3600
 }
 
 variable "cdn_max_ttl" {
   description = "Max TTL for Cloud CDN in seconds"
   type        = number
-  default     = 86400
 }
