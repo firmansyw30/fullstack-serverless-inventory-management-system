@@ -1,0 +1,108 @@
+name: Deploy Frontend on Push
+
+on:
+ push:
+   branches: [main] # Change to desired branch
+   paths:
+     - 'frontend/**'
+     - '.github/workflows/deploy-frontend.yml'
+ workflow_dispatch:
+
+env:
+ GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+ NODE_VERSION: '22.x'
+ NODE_OPTIONS: '--max_old_space_size=4096'
+ CLOUD_STORAGE_BUCKET: ${{ secrets.CLOUD_STORAGE_BUCKET }}
+ REACT_APP_API_KEY: ${{ secrets.GCLOUD_API_KEY }}
+
+jobs:
+ deploy-frontend:
+   name: Build and Deploy Frontend
+   runs-on: ubuntu-latest
+  
+   steps:
+     - name: Checkout code
+       uses: actions/checkout@v3
+    
+     - name: Authenticate to Google Cloud
+       uses: google-github-actions/auth@v1
+       with:
+         credentials_json: ${{ secrets.GCP_SA_KEY }}
+    
+     - name: Setup Terraform
+       uses: hashicorp/setup-terraform@v2
+       with:
+         terraform_version: 1.5.0
+         terraform_wrapper: false
+    
+     - name: Get Infrastructure Outputs
+       id: infra
+       working-directory: ./infrastructure
+       run: |
+         terraform init -input=false
+         API_URL=$(terraform output -raw api_gateway_url)
+         FRONTEND_BUCKET=$(terraform output -raw frontend_bucket_name)
+         FRONTEND_URL=$(terraform output -raw frontend_website_url)
+         echo "api_url=$API_URL" >> $GITHUB_OUTPUT
+         echo "frontend_bucket_name=$FRONTEND_BUCKET" >> $GITHUB_OUTPUT
+         echo "frontend_url=$FRONTEND_URL" >> $GITHUB_OUTPUT
+    
+     - name: Setup Node.js
+       uses: actions/setup-node@v3
+       with:
+         node-version: ${{ env.NODE_VERSION }}
+         cache: 'npm'
+         cache-dependency-path: frontend/package-lock.json
+    
+     - name: Configure Frontend with Real API Endpoint
+       working-directory: ./frontend
+       run: |
+         echo "🔧 Injecting API Gateway URL into frontend..."
+         cat > .env << EOF
+         REACT_APP_API_ENDPOINT=${{ steps.infra.outputs.api_url }}
+         REACT_APP_API_KEY=${{ secrets.GCLOUD_API_KEY }}
+         EOF
+         echo "✅ Frontend configured:"
+         cat .env
+    
+     - name: Install Dependencies
+       working-directory: ./frontend
+       run: npm ci
+    
+     - name: Build Frontend
+       working-directory: ./frontend
+       run: |
+         echo "🏗️ Building frontend with real API endpoint..."
+         npm run build
+         echo "✅ Build complete!"
+    
+     - name: Verify Build
+       working-directory: ./frontend
+       run: |
+         if [ ! -d "build" ]; then
+           echo "❌ Build directory not found!"
+           exit 1
+         fi
+         echo "✅ Build directory contents:"
+         ls -la build/ | head -20
+    
+     - name: Deploy to Cloud Storage
+       working-directory: ./frontend
+       run: |
+         echo "🚀 Deploying frontend to Cloud Storage..."
+          gsutil -m rsync -r -d build/ gs://${{ secrets.CLOUD_STORAGE_BUCKET }}
+         echo "✅ Frontend deployed!"
+    
+     - name: Deployment Summary
+       run: |
+         echo "## 🎉 Deployment Successful!" >> $GITHUB_STEP_SUMMARY
+         echo "" >> $GITHUB_STEP_SUMMARY
+         echo "### 📍 URLs:" >> $GITHUB_STEP_SUMMARY
+         echo "- **Frontend:** ${{ steps.urls.outputs.frontend_url }}/index.html" >> $GITHUB_STEP_SUMMARY
+         echo "- **API Gateway:** ${{ steps.urls.outputs.api_url }}" >> $GITHUB_STEP_SUMMARY
+         echo "" >> $GITHUB_STEP_SUMMARY
+         echo "### 🧪 Test Commands:" >> $GITHUB_STEP_SUMMARY
+         echo "\`\`\`bash" >> $GITHUB_STEP_SUMMARY
+         echo "# Test API" >> $GITHUB_STEP_SUMMARY
+         echo "curl ${{ steps.urls.outputs.api_url }}/v1/items" >> $GITHUB_STEP_SUMMARY
+         echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
