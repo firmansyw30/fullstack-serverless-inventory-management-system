@@ -93,4 +93,4 @@ For any questions or concerns, please contact us at [firmansyahwicaksono30@gmail
 💖 Thanks You
 
 ## Reference
-![Reference](https://github.com/OjoOluwagbenga700/serverless-inventory-management-system)
+[Reference](https://github.com/OjoOluwagbenga700/serverless-inventory-management-system)
