@@ -91,3 +91,6 @@ The project is licensed under the MIT License.
 For any questions or concerns, please contact us at [firmansyahwicaksono30@gmail.com](mailto:firmansyahwicaksono30@gmail.com).
 
 💖 Thanks You
+
+## Reference
+![Reference](https://github.com/OjoOluwagbenga700/serverless-inventory-management-system)
