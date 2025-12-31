@@ -70,6 +70,13 @@ To use the application, follow these steps:
 
 ## 📸 Screenshots
 
+![Fullstack Inventory Management System](https://myimgs.org/storage/images/14608/Fullstack%20Inventory%20Management%20System.png)
+![Screenshot 7](https://myimgs.org/storage/images/14609/7.png)
+![Screenshot 3](https://myimgs.org/storage/images/14610/3.png)
+![Screenshot 1](https://myimgs.org/storage/images/14611/1.png)
+![Screenshot 6](https://myimgs.org/storage/images/14612/6.png)
+![Screenshot 2](https://myimgs.org/storage/images/14613/2.png)
+
 
 ## 🤝 Contributing
 To contribute to the project, please follow these steps:
