@@ -1,8 +1,7 @@
 # ============================================================
-# Terraform Configuration Example - Inventory Management System
+# Terraform Configuration Template - Inventory Management System
 # ============================================================
 # 
-# This file is a template for configuring your Terraform deployment.
 # Copy this file to terraform.tfvars and update the values according
 # to your specific GCP project and preferences.
 #
@@ -15,168 +14,148 @@
 # ============================================================
 # Your Google Cloud Project ID (must already exist)
 # Find it in: https://console.cloud.google.com/home/dashboard
-project_id = "my-inventory-project-12345"
+project_id = ""
 
 # Primary Google Cloud Region for deployment
 # Available regions: us-central1, us-east1, asia-southeast2, europe-west1, etc.
 # See: https://cloud.google.com/compute/docs/regions-zones
-region = "asia-southeast2"
+region = ""
 
 # Primary Google Cloud Zone within the selected region
 # Must match the region prefix (e.g., asia-southeast2a for asia-southeast2)
-zone = "asia-southeast2a"
+zone = ""
 
-# Optional: Email of existing IAM Service Account (if using existing account)
-# Leave empty to create a new service account automatically
-# Format: service-account-name@project-id.iam.gserviceaccount.com
-# service_account_email = "terraform-sa@my-inventory-project-12345.iam.gserviceaccount.com"
+# ============================================================
+# IAM CONFIGURATION
+# ============================================================
+# Service Account ID (will be created if empty)
+service_account_id = ""
+
+# Display name for the Service Account
+service_account_display_name = ""
 
 # ============================================================
 # BACKEND CLOUD STORAGE CONFIGURATION
 # ============================================================
 # Location for Cloud Storage bucket storing Cloud Functions source code
 # Must be uppercase and match your region (e.g., US, ASIA-SOUTHEAST2, EUROPE-WEST1)
-cloud_storage_location = "ASIA-SOUTHEAST2"
+cloud_storage_location = ""
 
 # Name of the Cloud Storage bucket for Cloud Functions source code
 # Must be globally unique and follow GCS naming conventions
-# Format: lowercase, alphanumeric, hyphens allowed
-cloud_storage_bucket_name = "inventory-system-source-code"
+cloud_storage_bucket_name = ""
 
 # Enable uniform bucket-level access for security
 # Recommended: true (disables legacy ACLs)
-cloud_storage_uniform_bucket_level_access = true
-
-# Filename for the Cloud Functions source code zip file
-cloud_storage_object_filename = "functions.zip"
-
-# Source filename (path relative to this directory)
-cloud_storage_object_source_filename = "functions.zip"
+cloud_storage_uniform_bucket_level_access = false
 
 # ============================================================
 # CLOUD FUNCTION CONFIGURATION
 # ============================================================
-# Name of the Cloud Function to create
-# Must be unique within your project
-function_names = "inventory-management-function"
+# Prefix for Cloud Function names (unique within project)
+function_name_prefix = ""
 
 # Runtime for Cloud Functions
 # Supported: python39, python311, python312, nodejs18, nodejs20, etc.
-function_runtimes = "python39"
+function_runtimes = ""
 
 # Region where Cloud Functions will be deployed
 # Must be a valid Cloud Functions region
-function_location = "us-central1"
-
-# Description for the Cloud Function
-function_description = "Serverless inventory management functions"
+function_location = ""
 
 # Maximum number of concurrent function instances
 # Recommended range: 10-1000 depending on expected load
-function_max_instances_count = 100
+function_max_instances_count = 0
 
 # Memory allocation for each Cloud Function instance
 # Valid values: 128MB, 256MB, 512MB, 1024MB, 2048MB, 4096MB, 8192MB
-function_memory = "256M"
+function_memory = ""
 
 # Timeout duration for Cloud Function execution (in seconds)
 # Valid range: 1-3600 seconds
-function_timeout_seconds = 60
+function_timeout_seconds = 0
 
 # ============================================================
 # FRONTEND CLOUD STORAGE & CDN CONFIGURATION
 # ============================================================
 # Name of the Cloud Storage bucket for hosting React frontend
 # Must be globally unique and follow GCS naming conventions
-frontend_bucket_name = "inventory-system-frontend-hosting"
+frontend_bucket_name = ""
 
 # Location for the frontend hosting bucket
 # Should match or be close to your users' location for CDN efficiency
-frontend_bucket_location = "US"
+frontend_bucket_location = ""
 
 # Enable uniform bucket-level access for the frontend bucket
 # Recommended: true (for consistent access control)
-frontend_uniform_bucket_level_access = true
+frontend_uniform_bucket_level_access = false
 
 # Name of the Cloud CDN backend bucket
 # Must be unique within your project
-backend_bucket_name = "inventory-system-frontend-cdn"
+backend_bucket_name = ""
 
 # Enable Cloud CDN for improved frontend performance
 # Recommended: true (improves content delivery globally)
-enable_cdn = true
+enable_cdn = false
 
 # CDN cache mode - how aggressively to cache content
-# Options:
-#   - CACHE_ALL_STATIC: Cache all static content (recommended for frontend)
-#   - INVALIDATE_ON_CHANGES: Cache until content changes
-#   - USE_ORIGIN_HEADERS: Use cache headers from origin
-cdn_cache_mode = "CACHE_ALL_STATIC"
+# Options: CACHE_ALL_STATIC, INVALIDATE_ON_CHANGES, USE_ORIGIN_HEADERS
+cdn_cache_mode = ""
 
 # Enable negative caching (cache 404 responses)
 # Recommended: true (reduces load on origin for missing content)
-cdn_negative_caching = true
+cdn_negative_caching = false
 
 # Client-side cache TTL (Time To Live) in seconds
-# How long browsers will cache content
-cdn_client_ttl = 3600
+cdn_client_ttl = 0
 
 # CDN default cache TTL in seconds
-# How long CDN edge locations will cache content
-cdn_default_ttl = 3600
+cdn_default_ttl = 0
 
 # CDN maximum cache TTL in seconds
-# Maximum caching period regardless of origin headers
-cdn_max_ttl = 86400
+cdn_max_ttl = 0
+
+# Main page suffix (e.g., index.html)
+main_page_suffix = ""
+
+# Not found page (e.g., 404.html)
+not_found_page = ""
+
+# Allow destroy of frontend bucket (use with caution)
+allow_destroy = false
 
 # ============================================================
 # API GATEWAY CONFIGURATION
 # ============================================================
-# API ID for the API Gateway
-# Must be unique within your project
-# Format: lowercase, alphanumeric, hyphens allowed
-api_id = "inventory-api"
+# API ID for the API Gateway (lowercase, alphanumeric, hyphens allowed)
+api_id = ""
 
 # API Config ID for version control
-# Useful when deploying multiple versions of your API
-api_config_id = "inventory-api-config"
+api_config_id = ""
+
+# Release stage (e.g., beta, prod)
+release_stage = ""
 
 # Gateway ID - the actual API Gateway instance
-# Must be unique within your project
-gateway_id = "inventory-gateway"
+gateway_id = ""
 
 # Human-readable display name for the API Gateway
-# Shown in Google Cloud Console
-gateway_display_name = "Inventory Management API Gateway"
+gateway_display_name = ""
+
+# Region for API Gateway deployment
+gateway_region = ""
 
 # ============================================================
-# NOTES & BEST PRACTICES
+# CLOUD FIRESTORE CONFIGURATION
 # ============================================================
-#
-# 1. NAMING CONVENTIONS:
-#    - Cloud Storage bucket names must be globally unique
-#    - Use lowercase and hyphens only
-#    - Avoid timestamps in names (they'll expire)
-#
-# 2. REGIONS:
-#    - Choose regions close to your users for lower latency
-#    - Not all services are available in all regions
-#    - Cloud Functions location must differ from storage bucket location
-#
-# 3. SECURITY:
-#    - Keep this file in .gitignore (don't commit secrets)
-#    - Use a separate bucket for production configurations
-#    - Enable uniform bucket-level access for better security
-#
-# 4. COST OPTIMIZATION:
-#    - Adjust function_max_instances_count based on expected load
-#    - Use appropriate memory sizes (128MB sufficient for simple operations)
-#    - Enable CDN caching to reduce origin server load
-#
-# 5. BEFORE DEPLOYING:
-#    - Ensure GCP Project ID exists and is active
-#    - Verify you have necessary IAM permissions
-#    - Run: terraform plan (to review changes)
-#    - Run: terraform apply (to deploy)
-#
-# ============================================================
+# Location for Firestore database (e.g., nam5, asia-southeast2)
+firestore_location = ""
+
+# Database type: NATIVE or DATASTORE_MODE
+firestore_database_type = ""
+
+# Collection name for inventory items
+firestore_items_collection_name = ""
+
+# Firestore database name
+firestore_database_name = ""
